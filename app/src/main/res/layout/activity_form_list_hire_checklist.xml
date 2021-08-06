@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.formhirechecklist.FormListHireChecklistActivity">
+
+    <LinearLayout
+        android:id="@+id/LLOne"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/tv_search_name_employee_hire"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/rect"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="4dp"
+            android:hint="Search Name..."
+            android:textSize="16sp" />
+        <LinearLayout
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:gravity="center"
+                android:textSize="16sp"
+                android:hint="to date"
+                android:background="@drawable/rect"
+                android:layout_weight="1"
+                android:id="@+id/tv_search_joint_date_hire"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:src="@drawable/ic_baseline_date_range_24"
+                android:layout_weight="3"
+                android:id="@+id/btn_search_joint_date_hire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LLTwo"
+        android:layout_marginTop="60dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <EditText
+            android:inputType="number"
+            android:id="@+id/tv_search_npk_employee_hire"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/rect"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="4dp"
+            android:hint="Search NPK..."
+            android:textSize="16sp" />
+
+        <Spinner
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:hint="status.."
+            android:background="@drawable/rect"
+            android:id="@+id/spin_search_status_hire"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:background="@drawable/rect"
+        android:layout_marginTop="120dp"
+        android:id="@+id/rv_trx_inspection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_trx_hire_checklist" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_inspection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/dark"
+        android:foregroundGravity="bottom"
+        app:borderWidth="0dp"
+        android:src="@drawable/ic_baseline_add_24"
+        app:fabSize="normal"
+        app:layout_anchor="@id/rv_trx_inspection"
+        app:layout_anchorGravity="bottom|end" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

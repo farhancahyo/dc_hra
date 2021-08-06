@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_login"
+            android:contentDescription="TODO" />
+
+        <View
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_margin="20dp"
+        android:id="@+id/ll_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/logodover"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/ll_logo"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_marginBottom="20dp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"
+            android:textSize="24sp"
+            android:textColor="#fff"
+            android:text="PARAFORM DEPARTEMENT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:singleLine="true"
+            android:textColor="#000"
+            android:textColorHint="#7E7E7E"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:hint="Email"
+            android:id="@+id/edt_email"
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/rounded_corner"
+            android:textSize="17sp" />
+
+        <EditText
+            android:singleLine="true"
+            android:textColor="#000"
+            android:textColorHint="#7E7E7E"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:hint="Password"
+            android:id="@+id/edt_pass"
+            android:inputType="textPassword"
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/rounded_corner"
+            android:textSize="17sp" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_margin="20dp"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp"
+            android:background="@drawable/rounded_corner"
+            android:text="Login"
+            android:layout_width="match_parent"
+            android:layout_height="55dp" />
+    </LinearLayout>
+</RelativeLayout>
