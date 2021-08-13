@@ -48,7 +48,7 @@
             android:fontFamily="sans-serif"
             android:textSize="24sp"
             android:textColor="#fff"
-            android:text="PARAFORM DEPARTEMENT"
+            android:text="HR DEPARTEMENT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -86,6 +86,7 @@
             android:layout_margin="20dp"
             android:paddingRight="20dp"
             android:paddingLeft="20dp"
+            android:backgroundTint="@color/dark"
             android:background="@drawable/rounded_corner"
             android:text="Login"
             android:layout_width="match_parent"

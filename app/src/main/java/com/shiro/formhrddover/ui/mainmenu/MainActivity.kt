@@ -19,6 +19,8 @@ import com.google.android.material.navigation.NavigationView
 import com.shiro.formhrddover.R
 import com.shiro.formhrddover.databinding.ActivityMainBinding
 import com.shiro.formhrddover.helper.ViewModelFactory
+import com.shiro.formhrddover.ui.formhirechecklist.FormHireChecklistViewModel
+import com.shiro.formhrddover.ui.formhirechecklist.FormListHireChecklistActivity
 import com.shiro.formhrddover.ui.login.LoginActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -128,9 +130,9 @@ class MainActivity : AppCompatActivity() {
                     finish()
                     startActivity(Intent(this, LoginActivity::class.java))
                 }
-//                R.id.patrol -> {
-//                    startActivity(Intent(this, FormPlantPatrolListActivity::class.java))
-//                }
+                R.id.hirechecklist -> {
+                    startActivity(Intent(this, FormListHireChecklistActivity::class.java))
+                }
 //                R.id.shift -> {
 //                    startActivity(Intent(this, FormPlantShiftListActivity::class.java))
 ////                    Toast.makeText(this, "Under Construction", Toast.LENGTH_SHORT).show()

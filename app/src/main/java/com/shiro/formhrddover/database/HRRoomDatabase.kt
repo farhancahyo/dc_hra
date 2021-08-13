@@ -8,12 +8,13 @@ import androidx.room.TypeConverters
 import com.shiro.formhrddover.database.dao.HireCheckListDao
 import com.shiro.formhrddover.database.dao.OrientationDao
 import com.shiro.formhrddover.database.dao.UserDao
+import com.shiro.formhrddover.database.entity.hirechecklist.*
 import com.shiro.formhrddover.database.entity.user.DDIAuthPagesEntity
 import com.shiro.formhrddover.database.entity.user.DDIAuthUserEntity
 import com.shiro.formhrddover.database.entity.user.DDIRefMenuAdminEntity
 
 @Database(
-        entities = [DDIRefMenuAdminEntity::class, DDIAuthUserEntity::class, DDIAuthPagesEntity::class],
+        entities = [DDIRefMenuAdminEntity::class, DDIAuthUserEntity::class, DDIAuthPagesEntity::class, MCategoryEntity::class, MMappingCategoryEntity::class, MItemEntity::class, MDepartementEntity::class, TDetailNewHireCheckListEntity::class, TNewHireCheckListEntity::class],
         version = 1,
         exportSchema = false
 )

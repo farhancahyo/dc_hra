@@ -40,7 +40,7 @@ class LoginViewModel(application: Application) : ViewModel() {
         override fun doInBackground(vararg params: String): Boolean? {
 
             val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_pfa/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTA1MjQtQVBQMDAx"
+            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "ddi_auth_user")
@@ -138,7 +138,7 @@ class LoginViewModel(application: Application) : ViewModel() {
 
         override fun doInBackground(vararg params: String): Boolean? {
             val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_pfa/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTA1MjQtQVBQMDAx"
+            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "ddi_auth_pages")
@@ -231,7 +231,7 @@ class LoginViewModel(application: Application) : ViewModel() {
 
         override fun doInBackground(vararg params: String): Boolean? {
             val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_pfa/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTA1MjQtQVBQMDAx"
+            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request =
@@ -321,104 +321,4 @@ class LoginViewModel(application: Application) : ViewModel() {
             builder.show()
         }
     }
-
-//    inner class GetMShiftStatus(mContext: Context) : AsyncTask<String, Void, Boolean>() {
-//
-//        private val context = mContext
-//        private lateinit var progressDialog: ProgressDialog
-//        private val dataResponse = ArrayList<MStatusShiftEntity>()
-//
-//        @RequiresApi(Build.VERSION_CODES.O)
-//        override fun doInBackground(vararg params: String): Boolean {
-//
-//            val status1 = MStatusShiftEntity(1, "Un-Sync")
-//            val status2 = MStatusShiftEntity(2, "Sync")
-//
-//            dataResponse.add(status1)
-//            dataResponse.add(status2)
-//
-//            return true
-//        }
-//
-//        override fun onPreExecute() {
-//            super.onPreExecute()
-//            progressDialog = ProgressDialog(context)
-//            progressDialog.setMessage("loading")
-//            progressDialog.setCancelable(false)
-//            progressDialog.show()
-//
-//        }
-//
-//        override fun onPostExecute(hello: Boolean) {
-//            super.onPostExecute(hello)
-//            if (hello) {
-//                Log.d("KANO2", "BERHASIL DI MSTATUS")
-//                viewModelScope.launch {
-//                    viewModelScope.async { mUserRepository.clearMShiftStatus() }.await()
-//                    viewModelScope.async { mUserRepository.insertMShiftStatus(dataResponse) }
-//                        .await()
-//                }
-//                GetMstStatus(context).execute("")
-//            }
-//            if (progressDialog.isShowing) {
-//                progressDialog.dismiss()
-//            }
-//        }
-//    }
-
-//    inner class GetMstStatus(mContext: Context) : AsyncTask<String, Void, Boolean>() {
-//
-//        private val context = mContext
-//        private lateinit var progressDialog: ProgressDialog
-//        private val dataResponse = ArrayList<MStatusEntity>()
-//
-//        @RequiresApi(Build.VERSION_CODES.O)
-//        override fun doInBackground(vararg params: String): Boolean? {
-//
-//            val status1 = MStatusEntity(1, "On Progress")
-//            val status2 = MStatusEntity(2, "Completed")
-//            val status3 = MStatusEntity(3, "Cancel")
-//            val status4 = MStatusEntity(4, "Sync")
-//
-//            dataResponse.add(status1)
-//            dataResponse.add(status2)
-//            dataResponse.add(status3)
-//            dataResponse.add(status4)
-//
-//            return true
-//        }
-//
-//        override fun onPreExecute() {
-//            super.onPreExecute()
-//            progressDialog = ProgressDialog(context)
-//            progressDialog.setMessage("loading")
-//            progressDialog.setCancelable(false)
-//            progressDialog.show()
-//
-//        }
-//
-//        override fun onPostExecute(hello: Boolean) {
-//            super.onPostExecute(hello)
-//            if (hello) {
-//                Log.d("KANO2", "BERHASIL DI MSTATUS")
-//                viewModelScope.launch {
-//                    viewModelScope.async { mUserRepository.clearMStatus() }.await()
-//                    viewModelScope.async { mUserRepository.insertMStatus(dataResponse) }.await()
-//                }
-//                alertDialogComplete(context)
-//            }
-//            if (progressDialog.isShowing) {
-//                progressDialog.dismiss()
-//            }
-//        }
-//
-//        private fun alertDialogComplete(context: Context) {
-//            val builder = androidx.appcompat.app.AlertDialog.Builder(context)
-//            builder.setTitle("Messages")
-//            builder.setMessage("Get Data From Server Complete")
-//            builder.setPositiveButton("Okay") { _, _ ->
-//            }
-//            builder.show()
-//        }
-//    }
 }

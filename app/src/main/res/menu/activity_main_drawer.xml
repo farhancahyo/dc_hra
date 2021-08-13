@@ -3,9 +3,9 @@
     <item
         android:id="@+id/logout"
         android:title="Logout" />
-<!--    <item-->
-<!--        android:id="@+id/patrol"-->
-<!--        android:title="Paraform Plant Patrol" />-->
+    <item
+        android:id="@+id/hirechecklist"
+        android:title="New Hire Check List" />
 <!--    <item-->
 <!--        android:id="@+id/shift"-->
 <!--        android:title="Paraform Plant Shift" />-->

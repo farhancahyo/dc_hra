@@ -68,6 +68,8 @@
             android:text="Nama"
             android:textSize="24sp" />
         <EditText
+            android:includeFontPadding="true"
+            android:padding="5dp"
             android:textSize="24sp"
             android:background="@drawable/rect"
             android:id="@+id/edt_name_employee_hire"
@@ -80,12 +82,15 @@
             android:layout_marginTop="24dp"
             android:text="Title"
             android:textSize="24sp" />
-        <Spinner
+
+        <EditText
+            android:includeFontPadding="true"
+            android:padding="5dp"
             android:textSize="24sp"
             android:background="@drawable/rect"
-            android:id="@+id/spin_title_employee_hire"
+            android:id="@+id/edt_title_employee_hire"
             android:layout_width="match_parent"
-            android:layout_height="32dp"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -94,11 +99,11 @@
             android:text="Bagian"
             android:textSize="24sp" />
         <Spinner
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:background="@drawable/rect"
-            android:id="@+id/spin_division_hire"
+            android:id="@+id/spin_departement_hire"
             android:layout_width="match_parent"
-            android:layout_height="32dp"/>
+            android:layout_height="40dp"/>
 
         <TextView
             android:layout_marginTop="24dp"
@@ -112,7 +117,7 @@
         <LinearLayout
             android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:orientation="horizontal">
 
             <TextView
@@ -139,6 +144,8 @@
             android:text="NPK"
             android:textSize="24sp" />
         <EditText
+            android:includeFontPadding="true"
+            android:padding="5dp"
             android:textSize="24sp"
             android:background="@drawable/rect"
             android:id="@+id/edt_npk_employee_hire"
@@ -146,6 +153,7 @@
             android:layout_height="wrap_content"/>
 
         <LinearLayout
+            android:id="@+id/ll_operator"
             android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -168,7 +176,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll7"
+            android:id="@+id/ll_dibuat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

@@ -32,17 +32,17 @@
             <TextView
                 android:gravity="center"
                 android:textSize="16sp"
-                android:hint="to date"
+                android:hint="from date"
                 android:background="@drawable/rect"
                 android:layout_weight="1"
-                android:id="@+id/tv_search_joint_date_hire"
+                android:id="@+id/tv_from_date_hire"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
             <ImageButton
                 android:src="@drawable/ic_baseline_date_range_24"
                 android:layout_weight="3"
-                android:id="@+id/btn_search_joint_date_hire"
+                android:id="@+id/btn_form_date_hire"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -67,15 +67,29 @@
             android:hint="Search NPK..."
             android:textSize="16sp" />
 
-        <Spinner
+        <LinearLayout
             android:layout_weight="1"
-            android:padding="8dp"
-            android:textSize="16sp"
-            android:hint="status.."
-            android:background="@drawable/rect"
-            android:id="@+id/spin_search_status_hire"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:gravity="center"
+                android:textSize="16sp"
+                android:hint="to date"
+                android:background="@drawable/rect"
+                android:layout_weight="1"
+                android:id="@+id/tv_to_date_hire"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:src="@drawable/ic_baseline_date_range_24"
+                android:layout_weight="3"
+                android:id="@+id/btn_to_date_hire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
