@@ -1,4 +1,4 @@
-package com.shiro.formhrddover.database.entity.hirechecklist
+package com.shiro.formhrddover.database.entity.orientation
 
 import android.os.Parcelable
 import androidx.annotation.NonNull
@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
-@Entity(tableName = "t_new_hire_checklist_entity")
+@Entity(tableName = "t_orientation")
 @Parcelize
-data class TNewHireCheckListEntity(
+data class TOrientationEntity(
         @PrimaryKey
         @NonNull
         @ColumnInfo(name = "transactionno")
@@ -19,20 +19,23 @@ data class TNewHireCheckListEntity(
         @ColumnInfo(name = "employeename")
         var employeename: String,
 
+        @ColumnInfo(name = "employeeno")
+        var employeeno: Int,
+
         @ColumnInfo(name = "departementid")
         var departementid: Int,
 
         @ColumnInfo(name = "titlename")
         var titlename: String,
 
-        @ColumnInfo(name = "jointdate")
-        var jointdate: Date,
+        @ColumnInfo(name = "starteddate")
+        var starteddate: Date,
 
-        @ColumnInfo(name = "employeeno")
-        var employeeno: Int,
+        @ColumnInfo(name = "localsignfilename")
+        var localsignfilename: String,
 
-        @ColumnInfo(name = "memo")
-        var memo: String,
+        @ColumnInfo(name = "serversignfilename")
+        var serversignfilename: String,
 
         @ColumnInfo(name = "status")
         var status: Int,
@@ -57,8 +60,4 @@ data class TNewHireCheckListEntity(
 
         @ColumnInfo(name = "lastmodifiedname")
         var lastmodifiedname: String
-) : Parcelable {
-        override fun toString(): String {
-                return "$employeeno-$employeename-$departementid"
-        }
-}
+) : Parcelable

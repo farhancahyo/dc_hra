@@ -21,6 +21,7 @@ import com.shiro.formhrddover.databinding.ActivityMainBinding
 import com.shiro.formhrddover.helper.ViewModelFactory
 import com.shiro.formhrddover.ui.formhirechecklist.FormHireChecklistViewModel
 import com.shiro.formhrddover.ui.formhirechecklist.FormListHireChecklistActivity
+import com.shiro.formhrddover.ui.formorientationemployee.FormListOrientationActivity
 import com.shiro.formhrddover.ui.login.LoginActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -132,6 +133,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.hirechecklist -> {
                     startActivity(Intent(this, FormListHireChecklistActivity::class.java))
+                }
+                R.id.orientation -> {
+                    startActivity(Intent(this, FormListOrientationActivity::class.java))
+                }
+                R.id.setting -> {
+                    startActivity(Intent(this, SettingActivity::class.java))
                 }
 //                R.id.shift -> {
 //                    startActivity(Intent(this, FormPlantShiftListActivity::class.java))

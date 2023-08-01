@@ -9,12 +9,16 @@ import com.shiro.formhrddover.database.dao.HireCheckListDao
 import com.shiro.formhrddover.database.dao.OrientationDao
 import com.shiro.formhrddover.database.dao.UserDao
 import com.shiro.formhrddover.database.entity.hirechecklist.*
+import com.shiro.formhrddover.database.entity.orientation.MEmployeeEntity
+import com.shiro.formhrddover.database.entity.orientation.MUraianEntity
+import com.shiro.formhrddover.database.entity.orientation.TDetailOrientationEntity
+import com.shiro.formhrddover.database.entity.orientation.TOrientationEntity
 import com.shiro.formhrddover.database.entity.user.DDIAuthPagesEntity
 import com.shiro.formhrddover.database.entity.user.DDIAuthUserEntity
 import com.shiro.formhrddover.database.entity.user.DDIRefMenuAdminEntity
 
 @Database(
-        entities = [DDIRefMenuAdminEntity::class, DDIAuthUserEntity::class, DDIAuthPagesEntity::class, MCategoryEntity::class, MMappingCategoryEntity::class, MItemEntity::class, MDepartementEntity::class, TDetailNewHireCheckListEntity::class, TNewHireCheckListEntity::class],
+        entities = [DDIRefMenuAdminEntity::class, DDIAuthUserEntity::class, DDIAuthPagesEntity::class, MCategoryEntity::class, MMappingCategoryEntity::class, MItemEntity::class, MDepartementEntity::class, TDetailNewHireCheckListEntity::class, TNewHireCheckListEntity::class, MUraianEntity::class, TDetailOrientationEntity::class, TOrientationEntity::class, MEmployeeEntity::class],
         version = 1,
         exportSchema = false
 )

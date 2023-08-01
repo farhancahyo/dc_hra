@@ -14,6 +14,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.shiro.formhrddover.database.DateTypeConverter
+import com.shiro.formhrddover.database.entity.hirechecklist.TNewHireCheckListEntity
 import com.shiro.formhrddover.databinding.ActivityFormListHireChecklistBinding
 import com.shiro.formhrddover.helper.ViewModelFactory
 import com.shiro.formhrddover.ui.formhirechecklist.header.FormHeaderHireChecklistActivity
@@ -50,7 +54,9 @@ class FormListHireChecklistActivity : AppCompatActivity() {
 
     companion object{
         private var broadcastReceiver: BroadcastReceiver? = null
+        private var broadcastReceiverRefresh: BroadcastReceiver? = null
         val DATA_SAVED_BROADCAST: String = "com.example.formparaformdover.RAFATHAR"
+        val DATA_SAVED_BROADCAST_REFRESH: String = "com.example.formparaformdover.TOKYO"
         private const val JOB_ID = 10
     }
 
@@ -63,6 +69,12 @@ class FormListHireChecklistActivity : AppCompatActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 this@FormListHireChecklistActivity.runOnUiThread {
                     loadRefreshData(true)
+                }
+            }
+        }
+        broadcastReceiverRefresh = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                this@FormListHireChecklistActivity.runOnUiThread {
                     searchTrxHireChecklist()
                 }
             }
@@ -89,26 +101,27 @@ class FormListHireChecklistActivity : AppCompatActivity() {
         binding.btnToDateHire.setOnClickListener { dialogDate("to") }
 
         binding.fabAddInspection.setOnClickListener {
-            if (isJobRunning(this, JOB_ID)) {
-                val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-                scheduler.cancel(JOB_ID)
-                Toast.makeText(this, "Job Service canceled", Toast.LENGTH_SHORT).show()
-            }
+//            if (isJobRunning(this, JOB_ID)) {
+//                val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+//                scheduler.cancel(JOB_ID)
+//                Toast.makeText(this, "Job Service canceled", Toast.LENGTH_SHORT).show()
+//            }
             val intent = Intent(this, FormHeaderHireChecklistActivity::class.java)
             intent.putExtra(FormHeaderHireChecklistActivity.TYPE_INTENT, "INSERT")
             startActivity(intent)
         }
 
         formAdapter = FormHireChecklistAdapter(object : FormHireChecklistAdapter.ButtonHireListChecklistListener {
-            override fun btnViewListener(idtrx: String) {
-                if (isJobRunning(this@FormListHireChecklistActivity, JOB_ID)) {
-                    val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-                    scheduler.cancel(JOB_ID)
-                    Toast.makeText(this@FormListHireChecklistActivity, "Job Service canceled", Toast.LENGTH_SHORT).show()
-                }
+            override fun btnViewListener(idtrx: String, iscancel: Int) {
+//                if (isJobRunning(this@FormListHireChecklistActivity, JOB_ID)) {
+//                    val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+//                    scheduler.cancel(JOB_ID)
+//                    Toast.makeText(this@FormListHireChecklistActivity, "Job Service canceled", Toast.LENGTH_SHORT).show()
+//                }
                 val intent = Intent(this@FormListHireChecklistActivity, FormHeaderHireChecklistActivity::class.java)
                 intent.putExtra(FormHeaderHireChecklistActivity.TYPE_INTENT, "UPDATE")
                 intent.putExtra(FormHeaderHireChecklistActivity.EXTRA_TRANSACTION_ID, idtrx)
+                intent.putExtra(FormHeaderHireChecklistActivity.EXTRA_IS_CANCEL, iscancel)
                 startActivity(intent)
             }
         })
@@ -119,39 +132,24 @@ class FormListHireChecklistActivity : AppCompatActivity() {
 
     override fun onStop() {
         broadcastReceiver?.let { localBroadcastManager.unregisterReceiver(it) }
+        broadcastReceiverRefresh?.let { localBroadcastManager.unregisterReceiver(it) }
         super.onStop()
     }
 
     override fun onDestroy() {
         broadcastReceiver?.let { localBroadcastManager.unregisterReceiver(it) }
+        broadcastReceiverRefresh?.let { localBroadcastManager.unregisterReceiver(it) }
         super.onDestroy()
     }
 
     override fun onPause() {
         broadcastReceiver?.let { localBroadcastManager.unregisterReceiver(it) }
+        broadcastReceiverRefresh?.let { localBroadcastManager.unregisterReceiver(it) }
         super.onPause()
     }
 
     private fun loadRefreshData(full : Boolean){
-        val res = viewModel.GetMstCategory(this).execute().get()
-        if (res){
-            alertDialogCompleted()
-            viewModel.GetMstDepartement(this).execute().get()
-            viewModel.GetMstItem(this).execute().get()
-            viewModel.GetMstMappingCategory(this).execute().get()
-            if(full){
-                viewModel.GetTrxNewHireChecklist(this).execute().get()
-                viewModel.GetTrxDetailNewHireChecklist(this).execute().get()
-            }
-        }
-    }
-
-    private fun alertDialogCompleted() {
-        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-        builder.setTitle("Alert Messages")
-        builder.setMessage("Success refresh data master")
-        builder.setPositiveButton("Okay") { _, _ -> }
-        builder.show()
+        viewModel.refreshCuy(this, full)
     }
 
     private fun dialogDate(type : String) {
@@ -195,12 +193,12 @@ class FormListHireChecklistActivity : AppCompatActivity() {
         dpd.show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
 
         // jobscheduler
-        startJobSyncHire()
+//        startJobSyncHire()
         broadcastReceiver?.let {
             localBroadcastManager.registerReceiver(
                     it, IntentFilter(
@@ -208,16 +206,40 @@ class FormListHireChecklistActivity : AppCompatActivity() {
             )
             )
         }
+        broadcastReceiverRefresh?.let {
+            localBroadcastManager.registerReceiver(
+                    it, IntentFilter(
+                    DATA_SAVED_BROADCAST_REFRESH
+            )
+            )
+        }
 
         GlobalScope.launch {
             // Baca data kosong jika tidak ada data transaksi sama sekali di device
             val listTNewHireCheckListEntity = GlobalScope.async { viewModel.getTNewHireChecklist() }.await()
+            val listMan = arrayListOf<String>("Complete", "Cancel")
             this@FormListHireChecklistActivity.runOnUiThread {
+                val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+                        this@FormListHireChecklistActivity,
+                        R.layout.simple_spinner_item,
+                        listMan
+                )
+                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+                binding.spinSearchStatus.adapter = adapter
+                binding.spinSearchStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        searchTrxHireChecklist()
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
                 if(listTNewHireCheckListEntity.isEmpty()){
                     loadRefreshData(true)
-                    searchTrxHireChecklist()
                 } else {
-                    searchTrxHireChecklist()
+                    if(isOnline(this@FormListHireChecklistActivity)){
+                        loadRefreshData(false)
+                    } else {
+                        Toast.makeText(this@FormListHireChecklistActivity, "Anda sedang dalam jaringan offline", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -235,13 +257,26 @@ class FormListHireChecklistActivity : AppCompatActivity() {
         val edate = dateTypeConverter.stringToTimestamp(binding.tvToDateHire.text.toString())
         val name = binding.tvSearchNameEmployeeHire.text.toString()
         val no = binding.tvSearchNpkEmployeeHire.text.toString()
+        val position = binding.spinSearchStatus.selectedItemPosition
 
         GlobalScope.launch {
             val listHire = GlobalScope.async { viewModel.getTNewHireChecklist(sdate, edate, name, no) }.await()
-            Log.d("juju", listHire.toString())
             runOnUiThread {
                 if (!listHire.isNullOrEmpty()) {
-                    formAdapter.setDataInspection(listHire)
+                    val list = ArrayList<TNewHireCheckListEntity>()
+                    for (j in listHire) {
+                        if(position == 0) {
+                            if (j.iscancel == 0) {
+                                list.add(j)
+                            }
+                        } else {
+                            if (j.iscancel == 1) {
+                                list.add(j)
+                            }
+                        }
+                    }
+
+                    formAdapter.setDataInspection(list)
                     formAdapter.notifyDataSetChanged()
 
                     with(binding.rvTrxInspection) {
@@ -294,71 +329,71 @@ class FormListHireChecklistActivity : AppCompatActivity() {
         return false
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun startJobSyncHire() {
-        /*
-       Cek running job terlebih dahulu
-        */
-        if (isJobRunning(this, JOB_ID)) {
-            Toast.makeText(this, "Job Service is already scheduled", Toast.LENGTH_SHORT).show()
-            return
-        }
+//    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+//    fun startJobSyncHire() {
+//        /*
+//       Cek running job terlebih dahulu
+//        */
+//        if (isJobRunning(this, JOB_ID)) {
+//            Toast.makeText(this, "Job Service is already scheduled", Toast.LENGTH_SHORT).show()
+//            return
+//        }
+//
+//        val mServiceComponent = ComponentName(this, SyncHireCheckListJobScheduler::class.java)
+//
+//        val builder = JobInfo.Builder(JOB_ID, mServiceComponent)
+//
+//        /*
+//        Kondisi network,
+//        NETWORK_TYPE_ANY, berarti tidak ada ketentuan tertentu
+//        NETWORK_TYPE_UNMETERED, adalah network yang tidak dibatasi misalnya wifi
+//        */
+//        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//
+//        /*
+//        Kondisi device, secara default sudah pada false
+//        false, berarti device tidak perlu idle ketika job ke trigger
+//        true, berarti device perlu dalam kondisi idle ketika job ke trigger
+//        */
+//        builder.setRequiresDeviceIdle(false)
+//
+//        /*
+//        Kondisi charging
+//        false, berarti device tidak perlu di charge
+//        true, berarti device perlu dicharge
+//        */
+//        builder.setRequiresCharging(false)
+//
+//        /*
+//        Periode interval sampai ke trigger
+//        Dalam milisecond, 1000ms = 1detik
+//        */
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            builder.setPeriodic(900000) //15 menit
+//        } else {
+//            builder.setPeriodic(180000) //3 menit
+//        }
+//
+//        val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+//        scheduler.schedule(builder.build())
+//        Toast.makeText(this, "Job Service started", Toast.LENGTH_SHORT).show()
+//    }
 
-        val mServiceComponent = ComponentName(this, SyncHireCheckListJobScheduler::class.java)
-
-        val builder = JobInfo.Builder(JOB_ID, mServiceComponent)
-
-        /*
-        Kondisi network,
-        NETWORK_TYPE_ANY, berarti tidak ada ketentuan tertentu
-        NETWORK_TYPE_UNMETERED, adalah network yang tidak dibatasi misalnya wifi
-        */
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-
-        /*
-        Kondisi device, secara default sudah pada false
-        false, berarti device tidak perlu idle ketika job ke trigger
-        true, berarti device perlu dalam kondisi idle ketika job ke trigger
-        */
-        builder.setRequiresDeviceIdle(false)
-
-        /*
-        Kondisi charging
-        false, berarti device tidak perlu di charge
-        true, berarti device perlu dicharge
-        */
-        builder.setRequiresCharging(false)
-
-        /*
-        Periode interval sampai ke trigger
-        Dalam milisecond, 1000ms = 1detik
-        */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder.setPeriodic(900000) //15 menit
-        } else {
-            builder.setPeriodic(180000) //3 menit
-        }
-
-        val scheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        scheduler.schedule(builder.build())
-        Toast.makeText(this, "Job Service started", Toast.LENGTH_SHORT).show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun isJobRunning(context: Context, jobId: Int): Boolean {
-        var isScheduled = false
-
-        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-
-        for (jobInfo in scheduler.allPendingJobs) {
-            if (jobInfo.id == jobId) {
-                isScheduled = true
-                break
-            }
-        }
-
-        return isScheduled
-    }
+//    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+//    private fun isJobRunning(context: Context, jobId: Int): Boolean {
+//        var isScheduled = false
+//
+//        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+//
+//        for (jobInfo in scheduler.allPendingJobs) {
+//            if (jobInfo.id == jobId) {
+//                isScheduled = true
+//                break
+//            }
+//        }
+//
+//        return isScheduled
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
@@ -384,7 +419,6 @@ class FormListHireChecklistActivity : AppCompatActivity() {
                                             loadDataSync()
                                         } else {
                                             loadRefreshData(true)
-                                            searchTrxHireChecklist()
                                         }
                                     }
                                 }
@@ -422,14 +456,13 @@ class FormListHireChecklistActivity : AppCompatActivity() {
                     header.put("title_name", dataHeader.titlename)
                     header.put("joint_date", SimpleDateFormat("yyyy/MM/dd").format(dataHeader.jointdate))
                     header.put("employee_no", dataHeader.employeeno)
+                    header.put("memo", dataHeader.memo)
                     header.put("status", dataHeader.status)
+                    header.put("is_cancel", dataHeader.iscancel)
                     header.put("createddate", patternFormatDate(dataHeader.createddate))
                     header.put("createdby", dataHeader.createdby)
                     header.put("createdname", dataHeader.createdname)
-                    header.put(
-                            "lastmodifieddate",
-                            patternFormatDate(dataHeader.lastmodifieddate)
-                    )
+                    header.put("lastmodifieddate", patternFormatDate(dataHeader.lastmodifieddate))
                     header.put("lastmodifiedby", dataHeader.lastmodifiedby)
                     header.put("lastmodifiedname", dataHeader.lastmodifiedname)
 
@@ -459,9 +492,17 @@ class FormListHireChecklistActivity : AppCompatActivity() {
                         detail.put(obj)
                     }
 
+                    val name = JSONObject()
+                    name.put("employee_name", dataHeader.employeename)
+                    name.put("status", dataHeader.status)
+                    name.put("createddate", patternFormatDate(dataHeader.createddate))
+                    name.put("createdby", dataHeader.createdby)
+                    name.put("createdname", dataHeader.createdname)
+
                     val format = JSONObject()
                     format.put("header", header)
                     format.put("detail", detail)
+                    format.put("name", name)
                     Log.d("GSONSON2FORMAT", format.toString())
 
                     val res = SyncToHello(format, data.transactionno).execute().get()
@@ -472,10 +513,8 @@ class FormListHireChecklistActivity : AppCompatActivity() {
                 this@FormListHireChecklistActivity.runOnUiThread {
                     if (isSuccess) {
                         loadRefreshData(true)
-                        searchTrxHireChecklist()
                     } else {
                         loadRefreshData(false)
-                        searchTrxHireChecklist()
                     }
                 }
             }
@@ -489,11 +528,13 @@ class FormListHireChecklistActivity : AppCompatActivity() {
     inner class SyncToHello(format: JSONObject, mTrxIdOld: String) : AsyncTask<String, Void, ReturnFromServer>() {
 
         private val formata: JSONObject = format
-        private val spDataAPI = getSharedPreferences("DATAAPIINSPECTION", JobService.MODE_PRIVATE)
+        private val spDataAPI = getSharedPreferences("DATAAPIHRD", JobService.MODE_PRIVATE)
         private val trxIdOld = mTrxIdOld
 
         override fun doInBackground(vararg params: String): ReturnFromServer {
             var returnFromServer = ReturnFromServer("", false, 0)
+//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.5.254")
+//            val url = "$api/dovechem/dc_hra/Masters/API?token=c3luY0hpcmVDaGVja0xpc3QsMjAyMTAzMTgtQVBQMDAx"
             val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
             val url = "$api/dc_hrd/Masters/API?token=c3luY0hpcmVDaGVja0xpc3QsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(this@FormListHireChecklistActivity)
@@ -550,8 +591,6 @@ class FormListHireChecklistActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     data class ReturnFromServer(val trxno : String, val status : Boolean, val idsrv : Int)
 }

@@ -3,6 +3,8 @@ package com.shiro.formhrddover.ui.formhirechecklist.detail
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.Typeface
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.*
@@ -26,6 +28,7 @@ import com.shiro.formhrddover.database.DateTypeConverter
 import com.shiro.formhrddover.database.entity.hirechecklist.MCategoryEntity
 import com.shiro.formhrddover.database.entity.hirechecklist.MDepartementEntity
 import com.shiro.formhrddover.database.entity.hirechecklist.TDetailNewHireCheckListEntity
+import com.shiro.formhrddover.database.entity.hirechecklist.TNewHireCheckListEntity
 import com.shiro.formhrddover.databinding.ActivityFormDetailHireChecklistBinding
 import com.shiro.formhrddover.helper.ViewModelFactory
 import com.shiro.formhrddover.ui.formhirechecklist.FormHireChecklistViewModel
@@ -46,10 +49,13 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
     private lateinit var listDepartement: List<MDepartementEntity>
     private lateinit var listCategory: List<MCategoryEntity>
     private lateinit var adapterCategory: ArrayAdapter<MCategoryEntity>
+    private lateinit var tvImageCamera: TextView
+    private lateinit var dataHeader: TNewHireCheckListEntity
 
     companion object {
         private const val JOB_ID = 10
         const val EXTRA_TRANSACTION_ID = "extra_transaction_id"
+        const val EXTRA_NEW_HIRE_CHECKLIST = "extra_new_hire_checklist"
         private var idTrx = "TRXXX-00001"
         private var netsuite: Int = 0
         private var username: String = "Name"
@@ -81,33 +87,101 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
         netsuite = spDataLogin.getInt("IDNETSUITE", 0)
         username = spDataLogin.getString("USERNAME", "").toString()
         idTrx = intent.getStringExtra(EXTRA_TRANSACTION_ID).toString()
+        dataHeader = intent.getParcelableExtra(EXTRA_NEW_HIRE_CHECKLIST)!!
         val factory = ViewModelFactory.getInstance(this.application)
         viewModel = ViewModelProvider(this, factory)[FormHireChecklistViewModel::class.java]
 
         GlobalScope.launch {
             listCategory = GlobalScope.async { viewModel.getMCategory() }.await()
-            adapterCategory = ArrayAdapter<MCategoryEntity>(this@FormDetailHireChecklistActivity, android.R.layout.simple_spinner_item, listCategory)
-            adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinCategoryHire.adapter = adapterCategory
-            // Proses get dari spiner
-            binding.spinCategoryHire.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: View?,
-                                position: Int,
-                                id: Long
-                        ) {
-                            val selectedItem = binding.spinCategoryHire.selectedItem.toString()
-                            val strArray = selectedItem.split("-").toTypedArray()
-                            categoryid = strArray[0].toInt()
-                            loadViewItemCategory()
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {}
-                    }
+//            adapterCategory = ArrayAdapter<MCategoryEntity>(this@FormDetailHireChecklistActivity, android.R.layout.simple_spinner_item, listCategory)
+//            adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this@FormDetailHireChecklistActivity.runOnUiThread {
+                binding.edtMemoNewHireChecklist.setText(dataHeader.memo)
+//                binding.spinCategoryHire.adapter = adapterCategory
+                loadViewItemCategory()
+            }
+//            // Proses get dari spiner
+//            binding.spinCategoryHire.onItemSelectedListener =
+//                    object : AdapterView.OnItemSelectedListener {
+//                        override fun onItemSelected(
+//                                parent: AdapterView<*>?,
+//                                view: View?,
+//                                position: Int,
+//                                id: Long
+//                        ) {
+//                            val selectedItem = binding.spinCategoryHire.selectedItem.toString()
+//                            val strArray = selectedItem.split("-").toTypedArray()
+//                            categoryid = strArray[0].toInt()
+//
+//                        }
+//
+//                        override fun onNothingSelected(parent: AdapterView<*>?) {}
+//                    }
         }
     }
+
+//    private fun loadViewItemCategory() {
+//        val progressDialog = ProgressDialog(this@FormDetailHireChecklistActivity)
+//        progressDialog.setMessage("LOADING")
+//        progressDialog.setCancelable(false)
+//        progressDialog.show()
+//        binding.llayoutItemHire.removeAllViews()
+//        GlobalScope.launch {
+//            val listMItemUraianCheckList = GlobalScope.async { viewModel.getItemUraianChecklist(categoryid) }.await()
+//            val listdetail = GlobalScope.async { viewModel.getTDetailNewHireChecklist(idTrx, categoryid) }.await()
+//            if (listMItemUraianCheckList.isNotEmpty()) {
+//                for (item in listMItemUraianCheckList) {
+//                    this@FormDetailHireChecklistActivity.runOnUiThread {
+//                        // Conf Layout
+//                        val row = LinearLayout(this@FormDetailHireChecklistActivity)
+//                        row.id = item.mappingid
+//                        row.orientation = LinearLayout.VERTICAL
+//                        val viewGroup = LinearLayout.LayoutParams(
+//                                LinearLayout.LayoutParams.MATCH_PARENT,
+//                                LinearLayout.LayoutParams.WRAP_CONTENT
+//                        )
+//                        viewGroup.setMargins(0, 0, 0, 32)
+//                        row.layoutParams = viewGroup
+//                        row.setPadding(16, 16, 16, 16)
+//                        row.background = ContextCompat.getDrawable(
+//                                this@FormDetailHireChecklistActivity,
+//                                R.drawable.rect
+//                        )
+//
+//                        //
+//                        val chkList = CheckBox(this@FormDetailHireChecklistActivity)
+//                        chkList.layoutParams = LinearLayout.LayoutParams(
+//                                LinearLayout.LayoutParams.MATCH_PARENT,
+//                                LinearLayout.LayoutParams.MATCH_PARENT,
+//                                1.0f
+//                        )
+//                        chkList.isChecked = false
+//                        for (itemlow in listdetail) {
+//                            if (itemlow.mappingidcategory == item.mappingid) {
+//                                if (itemlow.valuecheck == 1) {
+//                                    chkList.isChecked = true
+//                                }
+//                            }
+//                        }
+//                        chkList.textSize = 24.0f
+//                        chkList.layoutDirection = View.LAYOUT_DIRECTION_RTL
+//                        chkList.text = item.itemname
+//                        chkList.gravity = Gravity.CENTER_VERTICAL
+//
+//                        row.addView(chkList)
+//
+//                        binding.llayoutItemHire.addView(row)
+//                    }
+//                }
+//            }
+//
+//            this@FormDetailHireChecklistActivity.runOnUiThread {
+//                if (progressDialog.isShowing) {
+//                    progressDialog.dismiss()
+//                }
+//            }
+//        }
+//    }
 
     private fun loadViewItemCategory() {
         val progressDialog = ProgressDialog(this@FormDetailHireChecklistActivity)
@@ -116,54 +190,99 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
         progressDialog.show()
         binding.llayoutItemHire.removeAllViews()
         GlobalScope.launch {
-            val listMItemUraianCheckList = GlobalScope.async { viewModel.getItemUraianChecklist(categoryid) }.await()
-            val listdetail = GlobalScope.async { viewModel.getTDetailNewHireChecklist(idTrx, categoryid) }.await()
-            if (listMItemUraianCheckList.isNotEmpty()) {
-                for (item in listMItemUraianCheckList) {
-                    this@FormDetailHireChecklistActivity.runOnUiThread {
-                        // Conf Layout
-                        val row = LinearLayout(this@FormDetailHireChecklistActivity)
-                        row.id = item.mappingid
-                        row.orientation = LinearLayout.VERTICAL
-                        val viewGroup = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        viewGroup.setMargins(0, 0, 0, 32)
-                        row.layoutParams = viewGroup
-                        row.setPadding(16, 16, 16, 16)
-                        row.background = ContextCompat.getDrawable(
-                                this@FormDetailHireChecklistActivity,
-                                R.drawable.rect
-                        )
+            if (listCategory.isNotEmpty()) {
+                for (item in listCategory) {
+//                    this@FormDetailHireChecklistActivity.runOnUiThread {
+                    // Conf Layout
+                    val row = LinearLayout(this@FormDetailHireChecklistActivity)
+                    row.id = item.internalid
+                    row.orientation = LinearLayout.VERTICAL
+                    val viewGroup = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    viewGroup.setMargins(0, 0, 0, 16)
+                    row.layoutParams = viewGroup
+                    row.setPadding(16, 16, 16, 16)
 
-                        //
-                        val chkList = CheckBox(this@FormDetailHireChecklistActivity)
-                        chkList.layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                1.0f
-                        )
-                        chkList.isChecked = false
-                        for (itemlow in listdetail) {
-                            if (itemlow.mappingidcategory == item.mappingid) {
-                                if (itemlow.valuecheck == 1) {
-                                    chkList.isChecked = true
+                    val linevg = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            3
+                    )
+                    linevg.setMargins(0, 8, 0, 0)
+                    val lineview = View(this@FormDetailHireChecklistActivity)
+                    lineview.layoutParams = linevg
+                    lineview.setBackgroundColor(Color.parseColor("#000000"))
+
+                    // Conf Layout
+                    val rowUraian = LinearLayout(this@FormDetailHireChecklistActivity)
+                    rowUraian.orientation = LinearLayout.VERTICAL
+                    rowUraian.layoutParams = viewGroup
+                    rowUraian.setPadding(16, 16, 16, 16)
+
+                    //
+                    val txtTitle = TextView(this@FormDetailHireChecklistActivity)
+                    txtTitle.layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            1.0f
+                    )
+                    txtTitle.text = item.categoryname
+                    txtTitle.textSize = 24.0f
+                    txtTitle.typeface = Typeface.DEFAULT_BOLD;
+                    txtTitle.gravity = Gravity.CENTER_VERTICAL
+                    Log.d("MEN", item.internalid.toString())
+//                        GlobalScope.launch {
+                    val listMItemUraianCheckList = GlobalScope.async { viewModel.getItemUraianChecklist(item.internalid) }.await()
+                    val listdetail = GlobalScope.async { viewModel.getTDetailNewHireChecklist(idTrx, item.internalid) }.await()
+                    if (listMItemUraianCheckList.isNotEmpty()) {
+                        for (data in listMItemUraianCheckList) {
+                            this@FormDetailHireChecklistActivity.runOnUiThread {
+                                // Conf Layout
+                                val rowDetail = LinearLayout(this@FormDetailHireChecklistActivity)
+                                rowDetail.id = data.mappingid
+                                rowDetail.orientation = LinearLayout.VERTICAL
+                                rowDetail.layoutParams = viewGroup
+                                rowDetail.setPadding(16, 16, 16, 16)
+                                rowDetail.background = ContextCompat.getDrawable(
+                                        this@FormDetailHireChecklistActivity,
+                                        R.drawable.rect
+                                )
+
+                                val chkList = CheckBox(this@FormDetailHireChecklistActivity)
+                                chkList.layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        1.0f
+                                )
+                                chkList.isChecked = false
+                                for (itemlow in listdetail) {
+                                    if (itemlow.mappingidcategory == data.mappingid) {
+                                        if (itemlow.valuecheck == 1) {
+                                            chkList.isChecked = true
+                                        }
+                                    }
                                 }
+                                chkList.textSize = 24.0f
+                                chkList.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                                chkList.text = data.itemname
+                                chkList.gravity = Gravity.CENTER_VERTICAL
+
+                                rowDetail.addView(chkList)
+                                rowUraian.addView(rowDetail)
                             }
                         }
-                        chkList.textSize = 24.0f
-                        chkList.layoutDirection = View.LAYOUT_DIRECTION_RTL
-                        chkList.text = item.itemname
-                        chkList.gravity = Gravity.CENTER_VERTICAL
-
-                        row.addView(chkList)
-
+                    }
+                    this@FormDetailHireChecklistActivity.runOnUiThread {
+                        row.addView(txtTitle)
+                        row.addView(lineview)
+                        row.addView(rowUraian)
                         binding.llayoutItemHire.addView(row)
                     }
+//                        }
+//                    }
                 }
             }
-
             this@FormDetailHireChecklistActivity.runOnUiThread {
                 if (progressDialog.isShowing) {
                     progressDialog.dismiss()
@@ -221,7 +340,26 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
         GlobalScope.launch {
-            val listdetail = GlobalScope.async { viewModel.getTDetailNewHireChecklist(idTrx, categoryid) }.await()
+            dataHeader.memo = this@FormDetailHireChecklistActivity.binding.edtMemoNewHireChecklist.text.toString()
+
+            val listNewHire = GlobalScope.async { viewModel.getTNewHireChecklist(dataHeader.transactionno) }.await()
+            if (listNewHire == null) {
+                val listNewHireEmployee = GlobalScope.async { viewModel.getTNewHireChecklistEmployee(dataHeader.employeeno) }.await()
+                if (listNewHireEmployee.isNotEmpty()) {
+                    runOnUiThread {
+                        if(progressDialog.isShowing){
+                            progressDialog.dismiss()
+                        }
+                        Toast.makeText(this@FormDetailHireChecklistActivity, "Employee number is already", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+                GlobalScope.async { viewModel.insertTNewHireChecklist(dataHeader) }.await()
+            } else {
+                GlobalScope.async { viewModel.updateTNewHireChecklist(dataHeader) }.await()
+            }
+
+            val listdetail = GlobalScope.async { viewModel.getTDetailNewHireChecklist(idTrx) }.await()
             if (listdetail.isNotEmpty()) {
                 for (detail in listdetail) {
                     GlobalScope.async { viewModel.deleteTDetailNewHireChecklist(detail) }.await()
@@ -229,34 +367,65 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
             }
             binding.llayoutItemHire.forEach { row ->
                 val rowFull = row as LinearLayout
-                val mappingId = rowFull.id
-                val chkBox = rowFull.getChildAt(0) as CheckBox
-                var valuecheck = 0
-                if (chkBox.isChecked) {
-                    valuecheck = 1
+                val idCategory = rowFull.id
+
+                val rowUraian = rowFull.getChildAt(2) as LinearLayout
+                rowUraian.forEach { rowDetail ->
+                    val rowD = rowDetail as LinearLayout
+
+                    val mappingId = rowD.id
+                    val chkBox = rowD.getChildAt(0) as CheckBox
+                    var valueCheck = 0
+                    if (chkBox.isChecked) {
+                        valueCheck = 1
+                    }
+                    val data = TDetailNewHireCheckListEntity(
+                            0,
+                            idTrx,
+                            idCategory,
+                            mappingId,
+                            valueCheck,
+                            netsuite,
+                            username,
+                            1,
+                            Date(),
+                            netsuite,
+                            username,
+                            Date(),
+                            netsuite,
+                            username
+                    )
+                    GlobalScope.async { viewModel.insertTDetailNewHireChecklist(data) }.await()
                 }
-                val data = TDetailNewHireCheckListEntity(
-                        0,
-                        idTrx,
-                        categoryid,
-                        mappingId,
-                        valuecheck,
-                        netsuite,
-                        username,
-                        1,
-                        Date(),
-                        netsuite,
-                        username,
-                        Date(),
-                        netsuite,
-                        username
-                )
-                GlobalScope.async { viewModel.insertTDetailNewHireChecklist(data) }.await()
+//                val mappingId = rowFull.id
+//                val chkBox = rowFull.getChildAt(0) as CheckBox
+//                var valuecheck = 0
+//                if (chkBox.isChecked) {
+//                    valuecheck = 1
+//                }
+//                val data = TDetailNewHireCheckListEntity(
+//                        0,
+//                        idTrx,
+//                        categoryid,
+//                        mappingId,
+//                        valuecheck,
+//                        netsuite,
+//                        username,
+//                        1,
+//                        Date(),
+//                        netsuite,
+//                        username,
+//                        Date(),
+//                        netsuite,
+//                        username
+//                )
+//                GlobalScope.async { viewModel.insertTDetailNewHireChecklist(data) }.await()
             }
             this@FormDetailHireChecklistActivity.runOnUiThread {
                 if (progressDialog.isShowing) {
                     progressDialog.dismiss()
                 }
+                finish()
             }
 //            if(isOnline(this@FormDetailHireChecklistActivity)){
 //                GlobalScope.launch {
@@ -346,7 +515,7 @@ class FormDetailHireChecklistActivity : AppCompatActivity() {
     inner class SyncToServer(format: JSONObject, mTrxIdOld: String) : AsyncTask<String, Void, ReturnFromServer>() {
 
         private val formata: JSONObject = format
-        private val spDataAPI = getSharedPreferences("DATAAPIINSPECTION", MODE_PRIVATE)
+        private val spDataAPI = getSharedPreferences("DATAAPIHRD", MODE_PRIVATE)
         private val trxIdOld = mTrxIdOld
         private lateinit var progressDialog: ProgressDialog
 

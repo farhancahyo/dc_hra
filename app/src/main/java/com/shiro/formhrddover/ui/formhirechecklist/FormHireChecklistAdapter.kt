@@ -60,7 +60,7 @@ class FormHireChecklistAdapter(val buttonHireListChecklistListener: ButtonHireLi
 
                 itemView.setOnClickListener {
                     buttonHireListChecklistListener.btnViewListener(
-                            data.transactionno
+                            data.transactionno, data.iscancel
                     )
 //                    (itemView.context as Activity).finish()
                 }
@@ -77,6 +77,6 @@ class FormHireChecklistAdapter(val buttonHireListChecklistListener: ButtonHireLi
     }
 
     interface ButtonHireListChecklistListener {
-        fun btnViewListener(idtrx: String)
+        fun btnViewListener(idtrx: String, iscancel: Int)
     }
 }

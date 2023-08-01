@@ -42,7 +42,9 @@ class HireChecklistRepository (application: Application) {
     suspend fun updateTNewHireCheckList(dataResponse: TNewHireCheckListEntity) = mHireCheckListDao.updateTNewHireChecklist(dataResponse)
     suspend fun getTNewHireCheckList(sdate: Long, edate: Long, name : String, no : String) = mHireCheckListDao.getTNewHireChecklist(sdate, edate, name, no)
     suspend fun getTNewHireCheckList(idTrx : String) = mHireCheckListDao.getTNewHireChecklist(idTrx)
+    suspend fun getTNewHireCheckListSearch(keyword : String) = mHireCheckListDao.getTNewHireChecklistSearch(keyword)
     suspend fun getTNewHireCheckList(status: Int) = mHireCheckListDao.getTNewHireChecklist(status)
+    suspend fun getTNewHireCheckListEmployee(employee: Int) = mHireCheckListDao.getTNewHireChecklistEmployee(employee)
     suspend fun getTNewHireCheckList() = mHireCheckListDao.getTNewHireChecklist()
     suspend fun getTNewHireCheckListOffline() = mHireCheckListDao.getTNewHireChecklistOffline()
 
@@ -50,6 +52,7 @@ class HireChecklistRepository (application: Application) {
     // Detail New Hire Checklist
     suspend fun deleteTDetailNewHireCheckList(data : TDetailNewHireCheckListEntity) = mHireCheckListDao.deleteTDetailNewHireChecklist(data)
     suspend fun clearTDetailNewHireCheckList()= mHireCheckListDao.clearTDetailNewHireCheckList()
+    suspend fun resetTDetailNewHireCheckList()= mHireCheckListDao.resetTDetailNewHireCheckList()
     suspend fun insertTDetailNewHireCheckList(dataResponse: ArrayList<TDetailNewHireCheckListEntity>) = mHireCheckListDao.insertTDetailNewHireCheckList(dataResponse)
     suspend fun insertTDetailNewHireCheckList(dataResponse: TDetailNewHireCheckListEntity) = mHireCheckListDao.insertTDetailNewHireCheckList(dataResponse)
     suspend fun updateTDetailNewHireCheckList(dataResponse: TDetailNewHireCheckListEntity) = mHireCheckListDao.updateTDetailNewHireCheckList(dataResponse)

@@ -1,7 +1,10 @@
 package com.shiro.formhrddover.ui.formhirechecklist
 
-import android.app.*
+import android.app.Activity
+import android.app.Application
+import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Handler
@@ -11,10 +14,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.shiro.formhrddover.database.entity.hirechecklist.*
 import com.shiro.formhrddover.database.repository.HireChecklistRepository
+import com.shiro.formhrddover.ui.formorientationemployee.FormListOrientationActivity
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -25,11 +30,17 @@ import kotlin.collections.ArrayList
 
 class FormHireChecklistViewModel(application: Application) : ViewModel() {
     private val mHireChecklistRepository = HireChecklistRepository(application)
+    private val spDataAPI = application.getSharedPreferences("DATAAPIHRD", AppCompatActivity.MODE_PRIVATE)
+//    private val api = spDataAPI.getString("APIGLOBAL", "http://192.168.5.254")
+//    private val url = "$api/dovechem/dc_hra/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
+    val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
+    val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
 
     suspend fun getTNewHireChecklist() = mHireChecklistRepository.getTNewHireCheckList()
     suspend fun getTNewHireChecklist(sdate : Long, edate : Long, name : String, no : String) = mHireChecklistRepository.getTNewHireCheckList(sdate, edate, name, no)
     suspend fun getTNewHireChecklist(idTrx : String) = mHireChecklistRepository.getTNewHireCheckList(idTrx)
     suspend fun getTNewHireChecklist(status : Int) = mHireChecklistRepository.getTNewHireCheckList(status)
+    suspend fun getTNewHireChecklistEmployee(employeeno : Int) = mHireChecklistRepository.getTNewHireCheckListEmployee(employeeno)
     suspend fun getTNewHireChecklistOffline() = mHireChecklistRepository.getTNewHireCheckListOffline()
     suspend fun getMDepartement() = mHireChecklistRepository.getMDepartement()
     suspend fun getMCategory() = mHireChecklistRepository.getMCategory()
@@ -72,19 +83,20 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
         return if (value == null) null else Date(value)
     }
 
-    inner class GetMstCategory(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-                mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
+    fun refreshCuy(activity: Activity, full: Boolean){
+        GetMstCategory(activity, full).execute()
+    }
+
+    inner class GetMstCategory(mContext: Activity, full: Boolean) : AsyncTask<String, Void, Boolean>() {
+
         private val context = mContext
+        private val mfull = full
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<MCategoryEntity>()
         private var isSuccess = false
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "m_category")
                     .setPriority(Priority.LOW).build()
@@ -153,7 +165,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
                 isSuccess = false
             }
@@ -178,7 +190,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     viewModelScope.async { mHireChecklistRepository.clearMCategory() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertMCategory(dataResponse) }.await()
                 }
-//                GetMstParameter(context).execute("")
+                GetMstItem(context, mfull).execute()
             } else {
                 alertDialog(context)
             }
@@ -188,19 +200,15 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
         }
     }
 
-    inner class GetMstItem(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-                mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
+    inner class GetMstItem(mContext: Activity, full: Boolean) : AsyncTask<String, Void, Boolean>() {
         private val context = mContext
+        private val mfull = full
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<MItemEntity>()
         private var isSuccess = false
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "m_item")
                     .setPriority(Priority.LOW).build()
@@ -269,7 +277,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
             }
             return isSuccess
@@ -293,7 +301,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     viewModelScope.async { mHireChecklistRepository.clearMItem() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertMItem(dataResponse) }.await()
                 }
-//                GetMstParameter(context).execute("")
+                GetMstDepartement(context, mfull).execute()
             } else {
                 alertDialog(context)
             }
@@ -303,9 +311,8 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
         }
     }
 
-    inner class GetMstDepartement(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-                mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
+    inner class GetMstDepartement(mContext: Activity, full: Boolean) : AsyncTask<String, Void, Boolean>() {
+        private val mfull = full
         private val context = mContext
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<MDepartementEntity>()
@@ -313,9 +320,8 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
+            val api = "http://115.85.65.42:8000"
+            val url = "$api/dc_api/WebAPI?token=Z2V0RGVwYXJ0bWVudCwyMDIxMDUyNC1BUFAwMDE="
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "m_departement")
                     .setPriority(Priority.LOW).build()
@@ -331,49 +337,18 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                             val item = items.getJSONObject(i)
 
                             val internalid: Int = item.getString("internal_id").toString().toInt()
-                            val netsuiteiddepartement: Int = item.getString("netsuite_id_departement").toString().toInt()
-                            val departementname: String = item.getString("departement_name").toString()
+                            val netsuiteiddepartement: Int = item.getString("netsuite_id").toString().toInt()
+                            val departementname: String = item.getString("name").toString()
                             val status: Int = item.getString("status").toString().toInt()
-                            val createddate: Date? = timestampToDate(
-                                    stringToTimestamp(
-                                            item.getString("createddate").toString()
-                                    )
+
+                            val mDataResponse = MDepartementEntity(
+                                internalid,
+                                netsuiteiddepartement,
+                                departementname,
+                                status,
+                                Date()
                             )
-                            val createdby: Int = item.getString("createdby").toString().toInt()
-                            val createdname: String = item.getString("createdname").toString()
-
-                            val lastmodifieddate: Date?
-                            val lastmodifiedby: Int
-                            val lastmodifiedname: String
-                            if (item.getString("lastmodifieddate").toString() != "null") {
-                                lastmodifieddate = timestampToDate(
-                                        stringToTimestamp(
-                                                item.getString("lastmodifieddate").toString()
-                                        )
-                                )
-                                lastmodifiedby = item.getString("lastmodifiedby").toString().toInt()
-                                lastmodifiedname = item.getString("lastmodifiedname").toString()
-                            } else {
-                                lastmodifieddate = createddate
-                                lastmodifiedby = createdby
-                                lastmodifiedname = createdname
-                            }
-
-                            if (createddate != null && lastmodifieddate != null) {
-                                val mDataResponse = MDepartementEntity(
-                                        internalid,
-                                        netsuiteiddepartement,
-                                        departementname,
-                                        status,
-                                        createddate,
-                                        createdby,
-                                        createdname,
-                                        lastmodifieddate,
-                                        lastmodifiedby,
-                                        lastmodifiedname
-                                )
-                                dataResponse.add(mDataResponse)
-                            }
+                            dataResponse.add(mDataResponse)
                         }
                     }
                 } catch (e: Exception) {
@@ -381,7 +356,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
             }
             return isSuccess
@@ -405,7 +380,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     viewModelScope.async { mHireChecklistRepository.clearMDepartement() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertMDepartement(dataResponse) }.await()
                 }
-//                GetMstParameter(context).execute("")
+                GetMstMappingCategory(context, mfull).execute()
             } else {
                 alertDialog(context)
             }
@@ -415,19 +390,15 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
         }
     }
 
-    inner class GetMstMappingCategory(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-                mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
+    inner class GetMstMappingCategory(mContext: Activity, full: Boolean) : AsyncTask<String, Void, Boolean>() {
         private val context = mContext
+        private val mfull = full
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<MMappingCategoryEntity>()
         private var isSuccess = false
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "m_mapping_category")
                     .setPriority(Priority.LOW).build()
@@ -465,7 +436,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
             }
             return isSuccess
@@ -489,7 +460,9 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     viewModelScope.async { mHireChecklistRepository.clearMMappingCategory() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertMMappingCategory(dataResponse) }.await()
                 }
-//                GetMstParameter(context).execute("")
+                if(mfull){
+                    GetTrxNewHireChecklist(context).execute()
+                }
             } else {
                 alertDialog(context)
             }
@@ -500,8 +473,6 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
     }
 
     inner class GetTrxNewHireChecklist(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-                mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
         private val context = mContext
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<TNewHireCheckListEntity>()
@@ -509,9 +480,6 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "t_new_hire_checklist")
                     .setPriority(Priority.LOW).build()
@@ -539,6 +507,10 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                             val employeeno: Int = item.getString("employee_no").toString().toInt()
 
                             val status: Int = item.getString("status").toString().toInt()
+
+                            val iscancel: Int = item.getString("is_cancel").toString().toIntOrNull() ?: 0
+
+                            val memo: String = item.getString("memo").toString()
 
                             val createddate: Date? = timestampToDate(
                                     stringToTimestamp(
@@ -575,7 +547,9 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                                         titlename,
                                         jointdate,
                                         employeeno,
-                                        status,
+                                        memo,
+                                        2,
+                                        iscancel,
                                         createddate,
                                         createdby,
                                         createdname,
@@ -592,7 +566,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
             }
             return isSuccess
@@ -616,7 +590,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     viewModelScope.async { mHireChecklistRepository.clearTNewHireCheckList() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertTNewHireCheckList(dataResponse) }.await()
                 }
-//                GetMstParameter(context).execute("")
+                GetTrxDetailNewHireChecklist(context).execute()
             } else {
                 alertDialog(context)
             }
@@ -627,17 +601,14 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
     }
 
     inner class GetTrxDetailNewHireChecklist(mContext: Activity) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI = mContext.getSharedPreferences("DATAAPIPARAFORM", AppCompatActivity.MODE_PRIVATE)
         private val context = mContext
+        private val localBroadcastManager = LocalBroadcastManager.getInstance(mContext)
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<TDetailNewHireCheckListEntity>()
         private var isSuccess = false
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-//            val api = spDataAPI.getString("APIGLOBAL", "http://192.168.100.61")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "t_detail_new_hire_checklist")
                     .setPriority(Priority.LOW).build()
@@ -721,7 +692,7 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                     Log.d("JSONHELPER" + "_Exception", e.toString())
                 }
             } else {
-                val anError = response.error
+                val anError = response.error.message
                 Log.d("ERX_Condition", anError.toString())
             }
             return isSuccess
@@ -743,8 +714,13 @@ class FormHireChecklistViewModel(application: Application) : ViewModel() {
                 Log.d("KANO2", "BERHASIL DI MEquipment")
                 viewModelScope.launch {
                     viewModelScope.async { mHireChecklistRepository.clearTDetailNewHireCheckList() }.await()
+                    viewModelScope.async { mHireChecklistRepository.resetTDetailNewHireCheckList() }.await()
                     viewModelScope.async { mHireChecklistRepository.insertTDetailNewHireCheckList(dataResponse) }.await()
                 }
+
+                // refresh lewat broadcast
+                val intent = Intent(FormListHireChecklistActivity.DATA_SAVED_BROADCAST_REFRESH)
+                localBroadcastManager.sendBroadcast(intent)
             } else {
                 alertDialog(context)
             }

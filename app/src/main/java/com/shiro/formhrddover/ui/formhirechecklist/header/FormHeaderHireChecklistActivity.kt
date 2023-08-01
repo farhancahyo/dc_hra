@@ -9,8 +9,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,8 +17,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.chip.Chip
-import com.shiro.formhrddover.R
 import com.shiro.formhrddover.database.DateTypeConverter
 import com.shiro.formhrddover.database.entity.hirechecklist.MDepartementEntity
 import com.shiro.formhrddover.database.entity.hirechecklist.TNewHireCheckListEntity
@@ -49,12 +45,13 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
     companion object {
         private const val JOB_ID = 10
         const val EXTRA_TRANSACTION_ID = "extra_transaction_id"
+        const val EXTRA_IS_CANCEL = "extra_is_cancel"
         const val TYPE_INTENT = "type_intent"
         private var netsuite: Int = 0
         private var username: String = "Name"
         var lastClickTime: Long = 0
         const val DOUBLE_CLICK_TIME_DELTA: Long = 100
-        val listStatus = mapOf(1 to "Un-Sync", 2 to "Sync")
+        val listStatus = mapOf(0 to "Complete", 1 to "Cancel")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -89,7 +86,8 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
 
             adapterDepartement = ArrayAdapter<MDepartementEntity>(this@FormHeaderHireChecklistActivity, android.R.layout.simple_spinner_item, listDepartement)
             adapterDepartement.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinDepartementHire.adapter = adapterDepartement
+            this@FormHeaderHireChecklistActivity.runOnUiThread {
+                binding.spinDepartementHire.adapter = adapterDepartement
 
             if (intent.getStringExtra(TYPE_INTENT) == "UPDATE") {
                 val idTrx = intent.getStringExtra(EXTRA_TRANSACTION_ID)
@@ -114,6 +112,7 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
                         binding.tvIdTrxHeaderHire.text = String.format("ZTRX1-%05d", 1)
                     }
                 }
+            }
             }
         }
 
@@ -140,6 +139,18 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
             val departementid = binding.spinDepartementHire.selectedItem.toString().split("-").toTypedArray()[0].toInt()
             // Joint Date
             val jointDate = dateTypeConverter.fromTimestamp(dateTypeConverter.stringToTimestamp(binding.tvJointDateHire.text.toString()))
+            if(binding.edtNameEmployeeHire.text.toString().isEmpty()){
+                binding.edtNameEmployeeHire.error = "Fill empty"
+                return
+            }
+            if(binding.edtTitleEmployeeHire.text.toString().isEmpty()){
+                binding.edtTitleEmployeeHire.error = "Fill empty"
+                return
+            }
+            if(binding.edtNpkEmployeeHire.text.toString().isEmpty()){
+                binding.edtNpkEmployeeHire.error = "Fill empty"
+                return
+            }
 
             if (binding.btnNextHire.text == "UPDATE") {
                 GlobalScope.launch {
@@ -150,17 +161,19 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
                         data.employeeno = binding.edtNpkEmployeeHire.text.toString().toInt()
                         data.departementid = departementid
                         data.status = 1
+                        data.iscancel = 0
                         data.jointdate = jointDate
                         data.lastmodifieddate = Date()
                         data.lastmodifiedby = netsuite
                         data.lastmodifiedname = username
                     }
-                    GlobalScope.async { viewModel.updateTNewHireChecklist(data) }.await()
-                    Handler(Looper.getMainLooper()).post {
+//                    GlobalScope.async { viewModel.updateTNewHireChecklist(data) }.await()
+                    this@FormHeaderHireChecklistActivity.runOnUiThread {
                         val intent = Intent(
                                 this@FormHeaderHireChecklistActivity, FormDetailHireChecklistActivity::class.java
                         )
                         intent.putExtra(FormDetailHireChecklistActivity.EXTRA_TRANSACTION_ID, idTrx)
+                        intent.putExtra(FormDetailHireChecklistActivity.EXTRA_NEW_HIRE_CHECKLIST, data)
                         startActivity(intent)
                         finish()
                     }
@@ -175,7 +188,9 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
                                 binding.edtTitleEmployeeHire.text.toString(),
                                 jointDate,
                                 binding.edtNpkEmployeeHire.text.toString().toInt(),
+                                "",
                                 1,
+                                0,
                                 Timestamp(System.currentTimeMillis()),
                                 netsuite,
                                 username,
@@ -183,11 +198,12 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
                                 netsuite,
                                 username
                         )
-                        GlobalScope.async { viewModel.insertTNewHireChecklist(data) }.await()
+//                        GlobalScope.async { viewModel.insertTNewHireChecklist(data) }.await()
                         this@FormHeaderHireChecklistActivity.runOnUiThread {
                             Toast.makeText(this@FormHeaderHireChecklistActivity, "Transaksi berhasil dibuat", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this@FormHeaderHireChecklistActivity, FormDetailHireChecklistActivity::class.java)
                             intent.putExtra(FormDetailHireChecklistActivity.EXTRA_TRANSACTION_ID, idTrx)
+                            intent.putExtra(FormDetailHireChecklistActivity.EXTRA_NEW_HIRE_CHECKLIST, data)
                             startActivity(intent)
                             finish()
                         }
@@ -224,9 +240,12 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
                         }
                     }
                     for (status in listStatus) {
-                        if (data.status == status.key) {
+                        if (data.iscancel == status.key) {
                             binding.tvStatusHeaderHire.text = status.value
                         }
+                    }
+                    if (data.iscancel == 1){
+                        binding.btnNextHire.isEnabled = false
                     }
                     if (progressDialog.isShowing) {
                         progressDialog.dismiss()
@@ -299,7 +318,67 @@ class FormHeaderHireChecklistActivity : AppCompatActivity() {
 
     }
 
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (intent.getStringExtra(TYPE_INTENT) == "UPDATE") {
+            val idTrx = intent.getStringExtra(EXTRA_TRANSACTION_ID)
+            val isCancel = intent.getIntExtra(EXTRA_IS_CANCEL, 0)
+            if (idTrx != null) {
+                if(isCancel == 1){
+                    menu?.add("Completed")?.setOnMenuItemClickListener {
+                        AlertDialog.Builder(this)
+                                // Judul
+                                .setTitle("Apa anda sudah yakin?")
+                                // Pesan yang di tampilkan
+                                .setMessage("Anda yakin ingin completed transaksi ini. sudahkah cek dengan seksama?")
+                                .setPositiveButton("Iya") { _, _ ->
+                                    GlobalScope.launch {
+                                        val tHeader = GlobalScope.async { viewModel.getTNewHireChecklist(idTrx) }.await()
+                                        tHeader.status = 1
+                                        tHeader.iscancel = 0
+                                        GlobalScope.async { viewModel.updateTNewHireChecklist(tHeader) }.await()
+                                        this@FormHeaderHireChecklistActivity.runOnUiThread {
+                                            binding.btnNextHire.isEnabled = true
+                                            binding.tvStatusHeaderHire.text = "Completed"
+                                            finish()
+                                        }
+                                    }
+                                }
+                                .setNegativeButton("Tidak") { _, _ ->
+                                    Toast.makeText(this, "Anda memilih tombol tidak", Toast.LENGTH_LONG).show()
+                                }
+                                .show()
+                        true
+                    }
+                } else {
+                    menu?.add("Cancel")?.setOnMenuItemClickListener {
+                        AlertDialog.Builder(this)
+                                // Judul
+                                .setTitle("Apa anda sudah yakin?")
+                                // Pesan yang di tampilkan
+                                .setMessage("Anda yakin ingin cancel transaksi ini. sudahkah cek dengan seksama?")
+                                .setPositiveButton("Iya") { _, _ ->
+                                    GlobalScope.launch {
+                                        val tHeader = GlobalScope.async { viewModel.getTNewHireChecklist(idTrx) }.await()
+                                        tHeader.status = 1
+                                        tHeader.iscancel = 1
+                                        GlobalScope.async { viewModel.updateTNewHireChecklist(tHeader) }.await()
+                                        this@FormHeaderHireChecklistActivity.runOnUiThread {
+                                            binding.btnNextHire.isEnabled = false
+                                            binding.tvStatusHeaderHire.text = "Cancel"
+                                            finish()
+                                        }
+                                    }
+                                }
+                                .setNegativeButton("Tidak") { _, _ ->
+                                    Toast.makeText(this, "Anda memilih tombol tidak", Toast.LENGTH_LONG).show()
+                                }
+                                .show()
+                        true
+                    }
+                }
+            }
+        }
         return super.onCreateOptionsMenu(menu)
     }
 

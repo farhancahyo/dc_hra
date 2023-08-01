@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_form_add_update"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,7 +18,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:orientation="horizontal">
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,14 +65,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Nama"
+            android:text="Employee Number"
             android:textSize="24sp" />
+
         <EditText
-            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:paddingHorizontal="4dp"
+            android:id="@+id/edt_number_employee_orientation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/rect"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Employee Name"
+            android:textSize="24sp" />
+
+        <EditText
+            android:paddingHorizontal="4dp"
             android:id="@+id/edt_name_employee_orientation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:background="@drawable/rect"
+            android:textSize="24sp" />
+
+<!--        <ListView-->
+<!--            android:nestedScrollingEnabled="true"-->
+<!--            android:visibility="gone"-->
+<!--            android:paddingHorizontal="4dp"-->
+<!--            android:id="@+id/lst_name_employee_orientation"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="100dp"-->
+<!--            android:background="@drawable/rect"-->
+<!--            android:textSize="24sp"-->
+<!--            tools:targetApi="lollipop" />-->
 
         <TextView
             android:layout_width="match_parent"
@@ -80,43 +109,46 @@
             android:layout_marginTop="24dp"
             android:text="Title"
             android:textSize="24sp" />
-        <Spinner
-            android:textSize="24sp"
-            android:background="@drawable/rect"
-            android:id="@+id/spin_title_employee_orientation"
+
+        <EditText
+            android:paddingHorizontal="4dp"
+            android:id="@+id/edt_title_employee_orientation"
             android:layout_width="match_parent"
-            android:layout_height="32dp"/>
+            android:layout_height="wrap_content"
+            android:background="@drawable/rect"
+            android:textSize="24sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Bagian"
+            android:text="Departement"
             android:textSize="24sp" />
+
         <Spinner
-            android:textSize="24sp"
-            android:background="@drawable/rect"
             android:id="@+id/spin_division_orientation"
             android:layout_width="match_parent"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp"
+            android:background="@drawable/rect"
+            android:textSize="24sp" />
 
         <TextView
-            android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:layout_weight="1.5"
             android:gravity="center_vertical"
-            android:text="Tanggal Masuk"
+            android:text="Started Date"
             android:textSize="24sp" />
 
         <LinearLayout
-            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tv_joint_date_hire"
+                android:id="@+id/tv_started_date_orientation_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -125,7 +157,7 @@
                 android:textSize="24sp" />
 
             <ImageButton
-                android:id="@+id/btn_joint_date_orientation"
+                android:id="@+id/btn_started_date_orientation_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
@@ -133,6 +165,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_created_orientation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ll0"
@@ -144,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="2"
-                android:text="Tanggal Dibuat"
+                android:text="Created Date"
                 android:textSize="24sp" />
 
             <TextView
@@ -158,7 +191,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll7"
+            android:id="@+id/ll_operator_orientation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -168,7 +201,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Dibuat Oleh"
+                android:text="Created By"
                 android:textSize="24sp" />
 
             <TextView
@@ -180,14 +213,62 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <Button
-            android:layout_marginTop="24dp"
-            android:id="@+id/btn_next_orientation"
-            style="@style/Base.Widget.AppCompat.Button.Colored"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:text="Next" />
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="DESCRIPTION"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="@android:color/black" />
+
+            <ScrollView
+                android:id="@+id/ll_dtl_5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="24dp">
+
+                <LinearLayout
+                    android:id="@+id/llayout_uraian_orientation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp" />
+            </ScrollView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Signature"
+                android:textSize="24sp" />
+
+            <ImageView
+                android:paddingVertical="8dp"
+                android:id="@+id/imgview_signature_orientation"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:background="@drawable/rect" />
+        </LinearLayout>
+
+        <Button
+            android:layout_marginTop="16dp"
+            android:text="SAVE"
+            android:id="@+id/btn_save_orientation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </ScrollView>

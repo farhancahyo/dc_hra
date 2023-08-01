@@ -50,7 +50,7 @@
 
     <LinearLayout
         android:id="@+id/LLTwo"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="50dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="40dp">
@@ -92,9 +92,24 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/LLThree"
+        android:layout_marginTop="95dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+        <Spinner
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:background="@drawable/rect"
+            android:id="@+id/spin_search_status"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:background="@drawable/rect"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="145dp"
         android:id="@+id/rv_trx_inspection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

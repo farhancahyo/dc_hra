@@ -3,7 +3,6 @@ package com.shiro.formhrddover.ui.formhirechecklist
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.ProgressDialog
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
@@ -11,11 +10,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -23,7 +19,6 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.shiro.formhrddover.R
 import com.shiro.formhrddover.database.entity.hirechecklist.MNotificationItem
-import com.shiro.formhrddover.ui.formhirechecklist.detail.FormDetailHireChecklistActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -39,7 +34,7 @@ class SyncHireCheckListJobScheduler : JobService() {
 
     companion object {
         private const val TAG = "KARINA"
-        private const val CHANNEL_NAME = "paraform_plant_shift"
+        private const val CHANNEL_NAME = "hrd_new_hire_checklist"
         private const val GROUP_KEY_EMAILS = "group_key_emails"
         private const val NOTIFICATION_REQUEST_CODE = 200
         private const val MAX_NOTIFICATION = 2
@@ -78,7 +73,9 @@ class SyncHireCheckListJobScheduler : JobService() {
                     header.put("title_name", dataHeader.titlename)
                     header.put("joint_date", SimpleDateFormat("yyyy/MM/dd").format(dataHeader.jointdate))
                     header.put("employee_no", dataHeader.employeeno)
+                    header.put("memo", dataHeader.memo)
                     header.put("status", dataHeader.status)
+                    header.put("is_cancel", dataHeader.iscancel)
                     header.put("createddate", patternFormatDate(dataHeader.createddate))
                     header.put("createdby", dataHeader.createdby)
                     header.put("createdname", dataHeader.createdname)
@@ -115,9 +112,17 @@ class SyncHireCheckListJobScheduler : JobService() {
                         detail.put(obj)
                     }
 
+                    val name = JSONObject()
+                    name.put("employee_name", dataHeader.employeename)
+                    name.put("status", dataHeader.status)
+                    name.put("createddate", patternFormatDate(dataHeader.createddate))
+                    name.put("createdby", dataHeader.createdby)
+                    name.put("createdname", dataHeader.createdname)
+
                     val format = JSONObject()
                     format.put("header", header)
                     format.put("detail", detail)
+                    format.put("name", name)
                     Log.d("GSONSON2FORMAT", format.toString())
 
                     val res = SyncToHello(format, data.transactionno).execute().get()
@@ -213,13 +218,15 @@ class SyncHireCheckListJobScheduler : JobService() {
     inner class SyncToHello(format: JSONObject, mTrxIdOld: String) : AsyncTask<String, Void, ReturnFromServer>() {
 
         private val formata: JSONObject = format
-        private val spDataAPI = getSharedPreferences("DATAAPIINSPECTION", MODE_PRIVATE)
+        private val spDataAPI = getSharedPreferences("DATAAPIHRD", AppCompatActivity.MODE_PRIVATE)
+//        private val api = spDataAPI.getString("APIGLOBAL", "http://192.168.5.254")
+//        private val url = "$api/dovechem/dc_hra/Masters/API?token=c3luY0hpcmVDaGVja0xpc3QsMjAyMTAzMTgtQVBQMDAx"
+        val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
+        val url = "$api/dc_hrd/Masters/API?token=c3luY0hpcmVDaGVja0xpc3QsMjAyMTAzMTgtQVBQMDAx"
         private val trxIdOld = mTrxIdOld
 
         override fun doInBackground(vararg params: String): ReturnFromServer {
             var returnFromServer = ReturnFromServer("", false, 0)
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_hrd/Masters/API?token=c3luY0hpcmVDaGVja0xpc3QsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(this@SyncHireCheckListJobScheduler)
 
             val request = AndroidNetworking.post(url)

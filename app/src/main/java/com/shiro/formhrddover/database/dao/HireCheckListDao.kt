@@ -11,7 +11,7 @@ interface HireCheckListDao {
     @Query("DELETE FROM m_category")
     suspend fun clearMCategory()
 
-    @Query("SELECT * FROM m_category ORDER BY internalid ASC")
+    @Query("SELECT * FROM m_category WHERE status = 1 ORDER BY internalid ASC")
     suspend fun getMCategory(): List<MCategoryEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -54,14 +54,20 @@ interface HireCheckListDao {
     @Query("SELECT * FROM t_new_hire_checklist_entity ORDER BY createddate DESC")
     suspend fun getTNewHireChecklist(): List<TNewHireCheckListEntity>
 
-    @Query("SELECT * FROM t_new_hire_checklist_entity WHERE employeename LIKE '%' || :name || '%' AND employeeno LIKE '%' || :no || '%' AND jointdate BETWEEN :sdate AND :edate ORDER BY createddate DESC")
+    @Query("SELECT * FROM t_new_hire_checklist_entity WHERE employeename LIKE '%' || :name || '%' AND employeeno LIKE '%' || :no || '%' AND jointdate BETWEEN :sdate AND :edate COLLATE NOCASE ORDER BY createddate DESC")
     suspend fun getTNewHireChecklist(sdate : Long, edate : Long, name : String, no : String): List<TNewHireCheckListEntity>
 
     @Query("SELECT * FROM t_new_hire_checklist_entity WHERE transactionno = :idtrx ORDER BY createddate DESC")
     suspend fun getTNewHireChecklist(idtrx : String): TNewHireCheckListEntity
 
+    @Query("SELECT * FROM t_new_hire_checklist_entity WHERE employeename LIKE '%' || :keyword || '%' ORDER BY createddate DESC")
+    suspend fun getTNewHireChecklistSearch(keyword : String): List<TNewHireCheckListEntity>
+
     @Query("SELECT * FROM t_new_hire_checklist_entity WHERE status = :status")
     suspend fun getTNewHireChecklist(status: Int): List<TNewHireCheckListEntity>
+
+    @Query("SELECT * FROM t_new_hire_checklist_entity WHERE employeeno = :employee")
+    suspend fun getTNewHireChecklistEmployee(employee: Int): List<TNewHireCheckListEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTNewHireChecklist(data: TNewHireCheckListEntity)
@@ -106,8 +112,11 @@ interface HireCheckListDao {
     @Query("DELETE FROM t_detail_new_hire_checklist_entity WHERE status = 2")
     suspend fun clearTDetailNewHireCheckList()
 
+    @Query("UPDATE sqlite_sequence SET seq = 0 WHERE name = 't_detail_new_hire_checklist_entity'")
+    suspend fun resetTDetailNewHireCheckList()
+
     // Relation
-    @Query("SELECT a.internalid AS mappingid, c.itemname as itemname, c.status as status FROM m_mapping_category a, m_category b, m_item c WHERE a.categoryid = b.internalid AND a.itemid = c.internalid AND a.categoryid = :categoryid")
+    @Query("SELECT a.internalid AS mappingid, c.itemname as itemname, c.status as status FROM m_mapping_category a, m_category b, m_item c WHERE a.categoryid = b.internalid AND a.itemid = c.internalid AND a.categoryid = :categoryid AND a.status = 1")
     suspend fun getItemUraianChecklist(categoryid: Int): List<MItemUraianCheckList>
 
     @Delete

@@ -94,12 +94,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:text="Tanggal Joint"
+                    android:text="Tanggal Masuk"
                     android:textSize="12sp" />
 
                 <TextView
                     android:layout_weight="1"
-                    android:id="@+id/tv_joint_date_orientation"
+                    android:id="@+id/tv_started_date_orientation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"

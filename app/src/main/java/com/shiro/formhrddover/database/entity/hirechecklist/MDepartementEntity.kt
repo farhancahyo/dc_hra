@@ -26,22 +26,22 @@ data class MDepartementEntity(
         var status: Int,
 
         @ColumnInfo(name = "createddate")
-        var createddate: Date,
+        var createddate: Date
 
-        @ColumnInfo(name = "createdby")
-        var createdby: Int,
-
-        @ColumnInfo(name = "createdname")
-        var createdname: String,
-
-        @ColumnInfo(name = "lastmodifieddate")
-        var lastmodifieddate: Date,
-
-        @ColumnInfo(name = "lastmodifiedby")
-        var lastmodifiedby: Int,
-
-        @ColumnInfo(name = "lastmodifiedname")
-        var lastmodifiedname: String
+//        @ColumnInfo(name = "createdby")
+//        var createdby: Int,
+//
+//        @ColumnInfo(name = "createdname")
+//        var createdname: String,
+//
+//        @ColumnInfo(name = "lastmodifieddate")
+//        var lastmodifieddate: Date,
+//
+//        @ColumnInfo(name = "lastmodifiedby")
+//        var lastmodifiedby: Int,
+//
+//        @ColumnInfo(name = "lastmodifiedname")
+//        var lastmodifiedname: String
 ) : Parcelable {
         override fun toString(): String {
                 return "$internalid-$departementname"

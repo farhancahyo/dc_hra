@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Nama"
+            android:text="Employee Name"
             android:textSize="24sp" />
         <EditText
             android:includeFontPadding="true"
@@ -96,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Bagian"
+            android:text="Departement"
             android:textSize="24sp" />
         <Spinner
             android:textSize="26sp"
@@ -141,9 +141,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="NPK"
+            android:text="Employee Number"
             android:textSize="24sp" />
         <EditText
+            android:inputType="number"
             android:includeFontPadding="true"
             android:padding="5dp"
             android:textSize="24sp"
@@ -163,7 +164,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Nama Petugas"
+                android:text="Officer Name"
                 android:textSize="24sp" />
 
             <TextView
@@ -186,7 +187,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Dibuat Oleh"
+                android:text="Created By"
                 android:textSize="24sp" />
 
             <TextView

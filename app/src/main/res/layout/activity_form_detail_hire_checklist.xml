@@ -11,34 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Category"
-            android:textSize="24sp" />
-        <Spinner
-            android:textSize="24sp"
-            android:background="@drawable/rect"
-            android:id="@+id/spin_category_hire"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"/>
-
-        <TextView
-            android:text="Item"
-            android:layout_marginTop="24dp"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/black" />
-
         <ScrollView
             android:layout_marginTop="24dp"
             android:id="@+id/ll_dtl_5"
@@ -52,6 +24,36 @@
                 android:orientation="vertical"
                 android:padding="8dp" />
         </ScrollView>
+
+        <LinearLayout
+            android:layout_marginBottom="32dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:text="Lain-lain"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
+
+            <EditText
+                android:paddingStart="4dp"
+                android:id="@+id/edt_memo_new_hire_checklist"
+                android:layout_marginTop="16dp"
+                android:textSize="24sp"
+                android:background="@drawable/rect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
 </ScrollView>

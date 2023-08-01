@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.shiro.formhrddover.databinding.ActivitySplashScreenBinding
+import com.shiro.formhrddover.ui.mainmenu.MainActivity
 
 class SplashScreenActivity : AppCompatActivity() {
 

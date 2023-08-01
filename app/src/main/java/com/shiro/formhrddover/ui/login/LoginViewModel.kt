@@ -21,6 +21,12 @@ import org.json.JSONObject
 class LoginViewModel(application: Application) : ViewModel() {
     private val mUserRepository = UserRepository(application)
 
+    private val spDataAPI = application.getSharedPreferences("DATAAPIHRD", AppCompatActivity.MODE_PRIVATE)
+//    private val api = spDataAPI.getString("APIGLOBAL", "http://192.168.5.254")
+//    private val url = "$api/dovechem/dc_hra/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
+    val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
+    val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
+
     fun loadData(mContext: Context) {
         GetDDIAuthUser(mContext).execute("")
     }
@@ -29,18 +35,12 @@ class LoginViewModel(application: Application) : ViewModel() {
         mUserRepository.getDDIAuthUserLogin(username, userpass)
 
     inner class GetDDIAuthUser(mContext: Context) : AsyncTask<String, Void, Boolean>() {
-
-        private val spDataAPI =
-            mContext.getSharedPreferences("DATAAPIINSPECTION", AppCompatActivity.MODE_PRIVATE)
         private val context = mContext
         private var isSuccess = false
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<DDIAuthUserEntity>()
 
         override fun doInBackground(vararg params: String): Boolean? {
-
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "ddi_auth_user")
@@ -129,16 +129,12 @@ class LoginViewModel(application: Application) : ViewModel() {
     }
 
     inner class GetDDIAuthPages(mContext: Context) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-            mContext.getSharedPreferences("DATAAPIINSPECTION", AppCompatActivity.MODE_PRIVATE)
         private val context = mContext
         private var isSuccess = false
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<DDIAuthPagesEntity>()
 
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request = AndroidNetworking.post(url).addBodyParameter("postData", "ddi_auth_pages")
@@ -222,16 +218,12 @@ class LoginViewModel(application: Application) : ViewModel() {
     }
 
     inner class GetDDIRefMenuAdmin(mContext: Context) : AsyncTask<String, Void, Boolean>() {
-        private val spDataAPI =
-            mContext.getSharedPreferences("DATAAPIINSPECTION", AppCompatActivity.MODE_PRIVATE)
         private val context = mContext
         private var isSuccess = false
         private lateinit var progressDialog: ProgressDialog
         private val dataResponse = ArrayList<DDIRefMenuAdminEntity>()
 
         override fun doInBackground(vararg params: String): Boolean? {
-            val api = spDataAPI.getString("APIGLOBAL", "http://115.85.65.42:8000")
-            val url = "$api/dc_hrd/Masters/API?token=Z2V0QWxsVGFibGUsMjAyMTAzMTgtQVBQMDAx"
             AndroidNetworking.initialize(context)
 
             val request =
